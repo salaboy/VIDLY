@@ -18,15 +18,29 @@ app.get('/api/genres', (req, res) => {
 //creat genre
 app.post('/api/genres', (req, res) => {
     //check if there is correct body //use created vaidation function Joi
-});
+    const { error } = validateGenre(req.body);
+    //bad request 400
+    if (error) return res.status(400).send(error.details[0].message);
 
-function validateGenre(genre){
-    const schema = {
-        name: Joi.string().length(3).required()
+    //genre has to have id and name
+    const genre = {
+        id: genres.length + 1,
+        name: req.body.name
     };
 
-    return Joi.validate(genre, schema);
-};
+    genres.push(genre);
+    res.send(genre);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+});
+
+//function to validate if name of the genre is correct 
+function validateGenre(genre) {
+    const schema = {
+      name: Joi.string().min(3).required()
+    };
+  
+    return Joi.validate(genre, schema);
+  }
+  
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Listening on port ${port}...`));
